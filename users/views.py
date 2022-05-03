@@ -8,6 +8,7 @@ from django.shortcuts import redirect, render
 from django.urls import reverse, reverse_lazy
 from django.contrib.auth.decorators import login_required
 from django.views.generic import DetailView, FormView, UpdateView
+from django.contrib.auth import views as auth_views
 # Models
 from django.contrib.auth.models import User
 from posts.models import Post
@@ -56,21 +57,28 @@ class SignupView(FormView):
         form.save()
         return super().form_valid(form)
     
-    
-    
-def login_view(request):
+
+class LoginView(auth_views.LoginView):
     # Login view
-    if request.method == 'POST':
-        username = request.POST['username']
-        password = request.POST['password']
-        user = authenticate(request, username =username, password=password)
-        if user:
-            login(request, user)
-            return redirect('posts:feed') 
-        else:
-            return render(request, 'users/login.html', {'error': 'invalid username and password'})
+    template_name = 'users/login.html'
+    
+# Tradicional method for login
+# def login_view(request):
+#     # Login view
+#     if request.method == 'POST':
+#         username = request.POST['username']
+#         password = request.POST['password']
+#         user = authenticate(request, username =username, password=password)
+#         if user:
+#             login(request, user)
+#             return redirect('posts:feed') 
+#         else:
+#             return render(request, 'users/login.html', {'error': 'invalid username and password'})
             
-    return render(request, 'users/login.html')
+#     return render(request, 'users/login.html')
+
+class LogoutView(LoginRequiredMixin, auth_views.LogoutView):
+    pass
 
 @login_required
 def logout_view(request):
